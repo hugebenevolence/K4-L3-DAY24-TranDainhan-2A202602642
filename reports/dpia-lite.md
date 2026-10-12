@@ -1,6 +1,7 @@
-# DPIA-lite — điền trong checkpoint 5
+# DPIA-lite cho lab dữ liệu giả
 
-1. Loại dữ liệu và phân loại:
-2. Mục đích xử lý và principal:
-3. Dữ liệu đi qua những run/tool nào, endpoint nào:
-4. Bằng chứng deny/allow và giới hạn của mock:
+1. **Dữ liệu:** ticket trong `corpus/` là nội dung không tin cậy (`internal`); hồ sơ trong `data/customers.json` chứa tên, CCCD, số điện thoại, STK và email giả (`restricted`). `KH-000999` và `KH-000777` đều là fixture synthetic.
+2. **Mục đích và người dùng:** `summarize-tickets` cho `search_docs`; `support-reply` cho `read_customer`. `support_l1` chỉ được tìm ticket, `dpo` được đọc hồ sơ liên quan. `--as` chọn role giả lập, không xác thực người vận hành.
+3. **Luồng:** Run A đọc ticket, lấy số từ tên `ticket-*.md`, che bốn loại PII trước tóm tắt. Run B chỉ nhận tập số ticket, kiểm policy trước khi mở mapping `related_tickets`, rồi kiểm lại trước từng `read_customer`. Lure yêu cầu POST được kiểm riêng với `restricted` và `egress_enabled=True`; chỉ URL đi vào quyết định, không truyền hồ sơ. Sink bị giới hạn cứng ở `127.0.0.1:10024`.
+4. **Bằng chứng:** `reports/attack-before.log:1` có POST dữ liệu giả trước sửa; `reports/attack-after.log` 0 byte sau sửa; `reports/ledger.jsonl` verify True và có `http_post` deny với reason. Test OBO, split và 8 lượt injection pass.
+5. **Giới hạn và rủi ro còn lại:** tìm kiếm từ khoá rộng khiến một query có thể khớp nhiều ticket và Run B đọc nhiều hồ sơ liên quan; production cần giới hạn tập truy vấn và minimization chặt hơn. Regex chỉ phù hợp mẫu lab, không bao quát mọi PII. Ledger một file không phát hiện cắt dòng cuối hoặc viết lại toàn chuỗi nếu thiếu mốc tin cậy ngoài file. Mock không chứng minh hệ thống thật an toàn hay tuân thủ pháp luật.
