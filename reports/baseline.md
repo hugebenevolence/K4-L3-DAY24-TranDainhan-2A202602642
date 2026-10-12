@@ -1,5 +1,7 @@
-# Baseline (trước containment)
+Báo cáo trạng thái ban đầu
 
-1. Chưa có identity và quyền theo từng run: `agent/loop.py:27-54` gọi tool trực tiếp; `principal_id` chưa được kiểm trong `_naive_loop()`.
-2. Không có cổng cho phép `http_post`: `agent/loop.py:44` gọi `tools.http_post()` khi `llm.find_injection()` thấy chỉ thị. `agent/tools.py` chỉ giới hạn đích vào sink localhost, không xét principal hay phân loại dữ liệu.
-3. `reports/attack-before.log:1` ghi một POST tới `/reconcile` chứa record giả `KH-000999` với CCCD, điện thoại, STK. Bằng chứng được tạo bằng baseline `_naive_loop()` trước khi hoàn thiện runner.
+Trước khi thêm các lớp kiểm tra thì hàm _naive_loop trong agent/loop.py lấy nội dung ticket và gọi công cụ trực tiếp nên agent chưa gắn quyền cụ thể cho người yêu cầu trong từng lần chạy
+
+Khi ticket chứa chỉ thị chèn vào thì luồng cũ gọi read_customer để lấy hồ sơ rồi gọi http_post để gửi dữ liệu và ở thời điểm đó agent/tools.py chỉ giới hạn đích gửi vào sink trên máy cục bộ chứ chưa quyết định theo mục đích hay quyền của principal
+
+Bằng chứng là reports/attack-before.log có bốn dòng tương ứng với bốn lure được chạy riêng và mỗi dòng đều ghi hồ sơ giả của KH-000999 được gửi tới sink trước khi runner được sửa

@@ -1,7 +1,13 @@
-# DPIA-lite cho lab dữ liệu giả
+Đánh giá tác động dữ liệu ở mức đơn giản
 
-1. **Dữ liệu:** ticket trong `corpus/` là nội dung không tin cậy (`internal`); hồ sơ trong `data/customers.json` chứa tên, CCCD, số điện thoại, STK và email giả (`restricted`). `KH-000999` và `KH-000777` đều là fixture synthetic.
-2. **Mục đích và người dùng:** `summarize-tickets` cho `search_docs`; `support-reply` cho `read_customer`. `support_l1` chỉ được tìm ticket, `dpo` được đọc hồ sơ liên quan. `--as` chọn role giả lập, không xác thực người vận hành.
-3. **Luồng:** Run A đọc ticket, lấy số từ tên `ticket-*.md`, che bốn loại PII trước tóm tắt. Run B chỉ nhận tập số ticket, kiểm policy trước khi mở mapping `related_tickets`, rồi kiểm lại trước từng `read_customer`. Lure yêu cầu POST được kiểm riêng với `restricted` và `egress_enabled=True`; chỉ URL đi vào quyết định, không truyền hồ sơ. Sink bị giới hạn cứng ở `127.0.0.1:10024`.
-4. **Bằng chứng:** `reports/attack-before.log:1` có POST dữ liệu giả trước sửa; `reports/attack-after.log` 0 byte sau sửa; `reports/ledger.jsonl` verify True và có `http_post` deny với reason. Test OBO, split và 8 lượt injection pass.
-5. **Giới hạn và rủi ro còn lại:** tìm kiếm từ khoá rộng khiến một query có thể khớp nhiều ticket và Run B đọc nhiều hồ sơ liên quan; production cần giới hạn tập truy vấn và minimization chặt hơn. Regex chỉ phù hợp mẫu lab, không bao quát mọi PII. Ledger một file không phát hiện cắt dòng cuối hoặc viết lại toàn chuỗi nếu thiếu mốc tin cậy ngoài file. Mock không chứng minh hệ thống thật an toàn hay tuân thủ pháp luật.
+Nội dung ticket trong corpus được xem là dữ liệu nội bộ có thể chứa chỉ thị không đáng tin cậy còn hồ sơ trong data/customers.json được xem là dữ liệu hạn chế vì có tên cùng số CCCD số điện thoại số tài khoản và email dù tất cả đều là dữ liệu giả phục vụ bài lab
+
+search_docs được dùng để tổng hợp ticket còn read_customer chỉ phục vụ trả lời hỗ trợ khi người yêu cầu có quyền phù hợp nên support_l1 chỉ tìm được ticket trong khi dpo có thể đọc hồ sơ của khách gắn với ticket cho mục đích support-reply
+
+Trong Run A agent đọc ticket rồi lấy số ticket từ tên file và che những giá trị PII phát hiện được trước khi tóm tắt sau đó Run B chỉ nhận tập số ticket để tra related_tickets trong nguồn tin cậy và kiểm policy trước khi mở kho hồ sơ cũng như trước từng lần đọc khách
+
+Nếu ticket yêu cầu gửi dữ liệu thì runner chỉ đưa URL vào lượt kiểm http_post với phân loại restricted và egress_enabled=True còn đích sink bị giới hạn ở 127.0.0.1:10024 nên hồ sơ không được đưa vào lời gọi gửi
+
+Trước khi sửa thì reports/attack-before.log có bốn dòng gửi dữ liệu giả của KH-000999 còn sau khi sửa reports/attack-after.log rỗng và reports/ledger.jsonl có quyết định từ chối http_post cùng lý do trong khi các test OBO split và injection vẫn giữ được chức năng hợp lệ cho dpo
+
+Kết quả này chỉ phản ánh dữ liệu và công cụ giả lập vì tìm kiếm theo từ khóa còn có thể trả về nhiều ticket khiến dpo đọc nhiều hồ sơ hơn mức cần thiết đồng thời regex PII có thể bỏ sót cách viết khác và ledger một file không phát hiện được việc cắt dòng cuối nếu không có mốc đối chiếu bên ngoài

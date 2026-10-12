@@ -1,7 +1,11 @@
-# Token giả trong lịch sử Git
+Báo cáo về token giả trong lịch sử Git
 
-- Scanner: Gitleaks v8.30.1, rule `lab24-synthetic-token` trong `.gitleaks.toml`.
-- `gitleaks git --config .gitleaks.toml --redact --verbose .` trả exit 1 như dự kiến: 1 finding tại `lab-fake-secret.txt:1`, commit `1bdd849922156c868a5ee9293d68f5b72e242d2c`. Giá trị này là token giả vô hiệu của bài lab; không sao chép token vào báo cáo.
-- `gitleaks dir --config .gitleaks.toml --redact .` trên thư mục hiện tại trả exit 0, không có finding. File tài liệu ví dụ do bản Gitleaks tải về đặt trong `.venv` đã được bỏ khỏi môi trường cục bộ trước khi quét; `.venv` không được commit.
-- Nếu là credential thật: thu hồi/rotate ngay, kiểm log dùng token, giới hạn tác động và thông báo bên liên quan theo quy trình ứng phó. Xoá file khỏi HEAD không vô hiệu hoá token nằm trong lịch sử Git; pin dependency hoặc hook cũng không thu hồi được credential đã lộ.
-- Hook `.pre-commit-config.yaml` pin `v8.30.1` và dùng `gitleaks-system`; `requirements.lock` có hash cho từng package. Hai biện pháp này kiểm nguồn cung ứng, không thay thế xử lý sự cố.
+Gitleaks phiên bản 8.30.1 được dùng cùng rule lab24-synthetic-token trong .gitleaks.toml để kiểm tra lịch sử Git và các file hiện tại
+
+Khi quét lịch sử thì công cụ trả mã thoát 1 và tìm đúng một token giả trong lab-fake-secret.txt tại commit 1bdd849922156c868a5ee9293d68f5b72e242d2c vì vậy finding này là tình huống được cài sẵn cho bài lab chứ không phải bằng chứng có credential thật đang hoạt động
+
+Khi quét cây làm việc hiện tại thì công cụ trả mã thoát 0 và không có finding nên giá trị token giả cũng không được sao chép vào báo cáo này
+
+Nếu một credential thật bị lộ thì cần thu hồi hoặc rotate ngay rồi kiểm tra log sử dụng để xác định phạm vi ảnh hưởng và xử lý theo quy trình ứng phó vì việc xóa file khỏi phiên bản mới không làm credential trong lịch sử Git mất hiệu lực
+
+Hook gitleaks-system đã được pin trong .pre-commit-config.yaml và các gói trong requirements.lock đều có hash để giảm rủi ro thay đổi dependency nhưng hai biện pháp này không thay thế bước thu hồi credential đã lộ
