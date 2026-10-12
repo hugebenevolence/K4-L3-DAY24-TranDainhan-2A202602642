@@ -1,9 +1,11 @@
-Đối chiếu kiểm soát của bài lab với các nguồn tham khảo
+Đối chiếu các kiểm soát trong bài lab
 
-Đối với Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15 tại https://vanban.chinhphu.vn/?docid=214590&pageid=27160 thì phần nhận diện và che dữ liệu nằm trong agent/pii.py dòng 42 và dòng 55 còn việc giới hạn quyền đọc cùng đường gửi dữ liệu nằm trong agent/policy.py dòng 60 và reports/attack-after.log vì vậy có thể chỉ ra các kiểm soát kỹ thuật liên quan đến chủ đề bảo vệ dữ liệu cá nhân nhưng điều khoản cụ thể chưa được xác minh và dữ liệu sử dụng ở đây chỉ là dữ liệu giả
+Với Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15 tại https://vanban.chinhphu.vn/?docid=214590&pageid=27160 thì agent/pii.py cho thấy cách nhận diện và che PII còn agent/policy.py cùng reports/attack-after.log cho thấy việc giới hạn đọc và gửi dữ liệu
 
-Đối với Nghị định 356/2025/NĐ-CP tại https://vanban.chinhphu.vn/?docid=216387&pageid=27160&typegroupid=4 thì agent/ledger.py dòng 49 và dòng 64 cùng reports/ledger.jsonl cho thấy từng quyết định công cụ có lý do và được nối bằng hash để kiểm tra sửa đổi tuy nhiên yêu cầu pháp lý về hồ sơ và thời hạn lưu giữ cũng như điều khoản cụ thể vẫn chưa được xác minh
+Với Nghị định 356/2025/NĐ-CP tại https://vanban.chinhphu.vn/?docid=216387&pageid=27160&typegroupid=4 thì agent/ledger.py và reports/ledger.jsonl là bằng chứng mỗi quyết định công cụ có lý do và hash để phát hiện sửa đổi
 
-Đối với Luật Trí tuệ nhân tạo số 134/2025/QH15 tại https://vanban.chinhphu.vn/?docid=216334&pageid=27160 thì agent/runner.py dòng 79 và dòng 100 cùng tests/test_split.py là bằng chứng về việc tách luồng xử lý và kiểm quyền trước khi đọc hồ sơ tuy nhiên đây chỉ là bài chạy mock nên không thể dùng làm kết luận về việc một hệ thống AI thật đã đáp ứng luật và điều khoản cụ thể cũng chưa được xác minh
+Với Luật Trí tuệ nhân tạo số 134/2025/QH15 tại https://vanban.chinhphu.vn/?docid=216334&pageid=27160 thì agent/runner.py và tests/test_split.py cho thấy hai run được tách ra và quyền được kiểm trước khi đọc hồ sơ
 
-Đối với các rủi ro ASI01 ASI03 và ASI04 trong tài liệu OWASP tại https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/ thì agent/runner.py dòng 136 và agent/policy.py dòng 60 cho thấy cách chặn chỉ thị từ ticket và giới hạn quyền thay mặt người dùng còn .pre-commit-config.yaml cùng requirements.lock và reports/secrets-incident.md thể hiện việc kiểm tra hook cùng dependency đây là phép đối chiếu rủi ro kỹ thuật chứ không phải chứng nhận bảo mật
+Với OWASP ASI01 ASI03 và ASI04 tại https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/ thì agent/runner.py và agent/policy.py liên quan đến chặn chỉ thị chèn vào cùng giới hạn quyền còn .pre-commit-config.yaml requirements.lock và reports/secrets-incident.md là bằng chứng kiểm tra nguồn cung ứng
+
+Các đối chiếu trên chỉ mô tả control của bài lab Điều khoản pháp lý cụ thể chưa xác minh và kết quả chạy mock với dữ liệu giả không chứng minh hệ thống thật đã tuân thủ pháp luật

@@ -1,11 +1,7 @@
-Báo cáo về token giả trong lịch sử Git
+Ghi nhận token giả trong lịch sử Git
 
-Gitleaks phiên bản 8.30.1 được dùng cùng rule lab24-synthetic-token trong .gitleaks.toml để kiểm tra lịch sử Git và các file hiện tại
+Gitleaks 8.30.1 dùng rule lab24-synthetic-token và tìm thấy một token giả trong lab-fake-secret.txt ở commit 1bdd849922156c868a5ee9293d68f5b72e242d2c Đây là dữ liệu được cài sẵn cho bài lab nên lệnh quét lịch sử trả mã 1 như dự kiến Cây làm việc hiện tại không có finding khi quét lại
 
-Khi quét lịch sử thì công cụ trả mã thoát 1 và tìm đúng một token giả trong lab-fake-secret.txt tại commit 1bdd849922156c868a5ee9293d68f5b72e242d2c vì vậy finding này là tình huống được cài sẵn cho bài lab chứ không phải bằng chứng có credential thật đang hoạt động
+Nếu đó là credential thật thì cần thu hồi hoặc rotate ngay rồi xem log sử dụng để xác định ảnh hưởng Xóa file ở commit mới không làm credential cũ mất hiệu lực
 
-Khi quét cây làm việc hiện tại thì công cụ trả mã thoát 0 và không có finding nên giá trị token giả cũng không được sao chép vào báo cáo này
-
-Nếu một credential thật bị lộ thì cần thu hồi hoặc rotate ngay rồi kiểm tra log sử dụng để xác định phạm vi ảnh hưởng và xử lý theo quy trình ứng phó vì việc xóa file khỏi phiên bản mới không làm credential trong lịch sử Git mất hiệu lực
-
-Hook gitleaks-system đã được pin trong .pre-commit-config.yaml và các gói trong requirements.lock đều có hash để giảm rủi ro thay đổi dependency nhưng hai biện pháp này không thay thế bước thu hồi credential đã lộ
+Hook gitleaks-system đã được pin trong .pre-commit-config.yaml còn requirements.lock ghi hash cho dependency Các kiểm tra này giúp tránh lặp lại sự cố nhưng không thay thế bước thu hồi khi credential thật bị lộ
